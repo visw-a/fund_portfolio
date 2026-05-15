@@ -1,31 +1,115 @@
 @import "tailwindcss";
 
-body {
-  background: #09090b;
-  color: #fafafa;
+/* ── Color tokens ──────────────────────────────────────────── */
+:root {
+  --navy-950: #04080F;
+  --navy-900: #07111F;
+  --navy-800: #0C1B31;
+  --navy-700: #112545;
+  --navy-600: #183560;
+  --navy-500: #204880;
+  --navy-400: #2E66A8;
+  --navy-300: #5B90C8;
+  --navy-200: #95B9D9;
+  --navy-100: #C8DEF0;
+  --navy-50:  #EAF2F8;
+  --gold:     #C4993A;
+  --gold-lt:  #DDB95A;
+  --green:    #27AE60;
+  --red:      #E03131;
+  --text-primary:   #EDF2F7;
+  --text-secondary: #7FA3BE;
+  --text-muted:     #3D6680;
+  --border:         #112545;
+  --border-lt:      #1A3560;
 }
 
+/* ── Base ──────────────────────────────────────────────────── */
+html { font-size: 14px; }
+
+body {
+  background: var(--navy-950);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* tabular figures everywhere numbers appear */
+.font-mono, [class*="font-mono"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ── Form elements ─────────────────────────────────────────── */
 .input {
   width: 100%;
-  background: #18181b;
-  border: 1px solid #3f3f46;
-  border-radius: 0.5rem;
+  background: var(--navy-800);
+  border: 1px solid var(--border-lt);
+  border-radius: 2px;
   padding: 0.5rem 0.75rem;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   outline: none;
   transition: border-color 0.15s;
 }
-
-.input:focus {
-  border-color: #60a5fa;
-}
+.input:focus { border-color: var(--gold); }
 
 .label {
   display: block;
-  font-size: 0.75rem;
-  color: #71717a;
-  margin-bottom: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
 }
+
+/* ── Cards / panels ────────────────────────────────────────── */
+.panel {
+  background: var(--navy-900);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* ── Table ─────────────────────────────────────────────────── */
+.th {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* ── Section header label ──────────────────────────────────── */
+.section-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Gold accent line at top of page ───────────────────────── */
+body::before {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold);
+  z-index: 100;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--navy-900); }
+::-webkit-scrollbar-thumb { background: var(--navy-600); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--navy-500); }
+
+/* ── Select element ────────────────────────────────────────── */
+select.input option { background: var(--navy-800); }
