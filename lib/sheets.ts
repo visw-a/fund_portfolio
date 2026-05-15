@@ -6,7 +6,18 @@ import { OPENING_CASH } from "./constants";
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
 function getAuth() {
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
+  // Support both a single JSON blob OR split individual vars (easier for Vercel)
+  let credentials: Record<string, string>;
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+    credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  } else {
+    credentials = {
+      type: "service_account",
+      client_email: process.env.GOOGLE_CLIENT_EMAIL!,
+      // Vercel stores \n literally — replace with actual newlines
+      private_key: (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
+    };
+  }
   return new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -181,7 +192,7 @@ export async function ensureSheetsExist(): Promise<void> {
   const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
   const existing = (meta.data.sheets ?? []).map((s) => s.properties?.title);
 
-  const toCreate = ["positions", "transactions"].filter(
+  const toCreate = ["positions", "transactions", "nav_history"].filter(
     (name) => !existing.includes(name)
   );
   if (toCreate.length === 0) return;
@@ -216,6 +227,57 @@ export async function ensureSheetsExist(): Promise<void> {
         values: [["id", "date", "ticker", "direction", "action",
           "shares", "price", "cash_flow", "notes"]],
       },
+    });
+  }
+  if (toCreate.includes("nav_history")) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: "nav_history!A1:C1",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [["date", "nav", "spy_price"]] },
+    });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: "nav_history!A:C",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [["2026-01-01", 754224.62, 591.79]] },
+    });
+  }
+}
+
+// ── NAV History ────────────────────────────────────────────────────────────
+
+export interface NavSnapshot { date: string; nav: number; spyPrice: number; }
+
+export async function getNavHistory(): Promise<NavSnapshot[]> {
+  const sheets = await getSheets();
+  const res = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "nav_history!A2:C" });
+  return (res.data.values ?? []).filter((r) => r[0]).map((r) => ({
+    date: r[0], nav: parseFloat(r[1]) || 0, spyPrice: parseFloat(r[2]) || 0,
+  }));
+}
+
+export async function upsertNavSnapshot(date: string, nav: number, spyPrice: number): Promise<void> {
+  const sheets = await getSheets();
+  const res = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "nav_history!A:A" });
+  const rows = res.data.values ?? [];
+  const rowIdx = rows.findIndex((r) => r[0] === date);
+
+  if (rowIdx > 0) {
+    // Update existing row
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: `nav_history!B${rowIdx + 1}:C${rowIdx + 1}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[nav, spyPrice]] },
+    });
+  } else {
+    // Append new row
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: "nav_history!A:C",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[date, nav, spyPrice]] },
     });
   }
 }

@@ -1,30 +1,34 @@
 @import "tailwindcss";
 
-/* ── Color tokens ──────────────────────────────────────────── */
+/* ── Color tokens ─────────────────────────────────────────── */
 :root {
-  --navy-950: #04080F;
-  --navy-900: #07111F;
-  --navy-800: #0C1B31;
-  --navy-700: #112545;
-  --navy-600: #183560;
-  --navy-500: #204880;
-  --navy-400: #2E66A8;
-  --navy-300: #5B90C8;
-  --navy-200: #95B9D9;
-  --navy-100: #C8DEF0;
-  --navy-50:  #EAF2F8;
-  --gold:     #C4993A;
-  --gold-lt:  #DDB95A;
-  --green:    #27AE60;
-  --red:      #E03131;
-  --text-primary:   #EDF2F7;
-  --text-secondary: #7FA3BE;
+  --navy-950: #030810;
+  --navy-900: #060F1E;
+  --navy-800: #0A1628;
+  --navy-700: #0F2040;
+  --navy-600: #142D59;
+  --navy-500: #1C3F7A;
+  --navy-400: #2E5FA8;
+  --navy-300: #4A7FC1;
+  --navy-200: #8AB0D8;
+  --navy-100: #C0D8EE;
+  --navy-50:  #E8F2FA;
+
+  --blue:     #3B6CC7;    /* primary interactive accent — replaces gold */
+  --blue-lt:  #5587D9;
+
+  --green:    #22C55E;
+  --red:      #EF4444;
+
+  --text-primary:   #F0F4F8;
+  --text-secondary: #8AB0D8;
   --text-muted:     #3D6680;
-  --border:         #112545;
-  --border-lt:      #1A3560;
+
+  --border:    #0F2040;
+  --border-lt: #142D59;
 }
 
-/* ── Base ──────────────────────────────────────────────────── */
+/* ── Base ─────────────────────────────────────────────────── */
 html { font-size: 14px; }
 
 body {
@@ -32,15 +36,13 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 13px;
 }
 
-/* tabular figures everywhere numbers appear */
-.font-mono, [class*="font-mono"] {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
+/* Tabular numbers everywhere */
+* { font-variant-numeric: tabular-nums; }
 
-/* ── Form elements ─────────────────────────────────────────── */
+/* ── Form elements ────────────────────────────────────────── */
 .input {
   width: 100%;
   background: var(--navy-800);
@@ -48,68 +50,43 @@ body {
   border-radius: 2px;
   padding: 0.5rem 0.75rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 13px;
   outline: none;
   transition: border-color 0.15s;
 }
-.input:focus { border-color: var(--gold); }
+.input:focus { border-color: var(--blue); }
 
 .label {
   display: block;
-  font-size: 0.625rem;
+  font-size: 10px;
   font-weight: 700;
   color: var(--text-muted);
-  margin-bottom: 0.35rem;
+  margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-/* ── Cards / panels ────────────────────────────────────────── */
-.panel {
-  background: var(--navy-900);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+/* ── Nav hover ────────────────────────────────────────────── */
+.nav-link:hover {
+  color: #fff !important;
+  background: var(--navy-800) !important;
 }
 
-/* ── Table ─────────────────────────────────────────────────── */
-.th {
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  padding-bottom: 0.625rem;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-/* ── Section header label ──────────────────────────────────── */
-.section-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* ── Gold accent line at top of page ───────────────────────── */
+/* ── Top accent stripe ────────────────────────────────────── */
 body::before {
   content: "";
   display: block;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--gold);
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--blue);
   z-index: 100;
 }
 
-/* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--navy-900); }
-::-webkit-scrollbar-thumb { background: var(--navy-600); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--navy-500); }
+::-webkit-scrollbar-thumb { background: var(--navy-600); border-radius: 2px; }
 
-/* ── Select element ────────────────────────────────────────── */
+/* ── Select ───────────────────────────────────────────────── */
 select.input option { background: var(--navy-800); }

@@ -49,11 +49,11 @@ export default function LoginPage() {
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
           <div style={{
             width: 56, height: 56,
-            border: "1px solid var(--gold)",
+            border: "1px solid var(--blue)",
             display: "flex", alignItems: "center", justifyContent: "center",
             margin: "0 auto 1.25rem",
           }}>
-            <span style={{ color: "var(--gold)", fontSize: "1.125rem", fontWeight: 700, letterSpacing: "0.05em" }}>MII</span>
+            <span style={{ color: "var(--blue)", fontSize: "1.125rem", fontWeight: 700, letterSpacing: "0.05em" }}>MII</span>
           </div>
           <h1 style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "0.02em", marginBottom: 4 }}>
             McIntire Investment Institute

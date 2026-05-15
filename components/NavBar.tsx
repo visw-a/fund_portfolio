@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import LogoutButton from "./LogoutButton";
 
 const NAV_LINKS = [
@@ -15,62 +16,70 @@ export default function NavBar() {
       background: "var(--navy-900)",
       borderBottom: "1px solid var(--border)",
       position: "sticky",
-      top: "2px",
+      top: "3px",
       zIndex: 40,
     }}>
       <div style={{
         maxWidth: 1400, margin: "0 auto", padding: "0 1.5rem",
-        height: 58, display: "flex", alignItems: "center", justifyContent: "space-between",
+        height: 60, display: "flex", alignItems: "center", justifyContent: "space-between",
+        gap: "1.5rem",
       }}>
-        {/* Logo + fund name */}
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: "0.875rem", textDecoration: "none" }}>
-          <div style={{
-            width: 36, height: 36,
-            border: "1px solid var(--gold)",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <span style={{ color: "var(--gold)", fontSize: "0.8rem", fontWeight: 700, letterSpacing: "0.05em" }}>MII</span>
-          </div>
+
+        {/* Logo + name */}
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: "0.875rem", textDecoration: "none", flexShrink: 0 }}>
+          <Image
+            src="/bull-logo.png"
+            alt="McIntire Investment Institute"
+            width={40}
+            height={28}
+            style={{ objectFit: "contain", filter: "brightness(0) invert(1)", opacity: 0.9 }}
+          />
           <div>
-            <div style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: "0.875rem", letterSpacing: "0.02em", lineHeight: 1.2 }}>
+            <div style={{
+              color: "var(--text-primary)", fontWeight: 700, fontSize: "15px",
+              letterSpacing: "0.01em", lineHeight: 1.2,
+            }}>
               McIntire Investment Institute
             </div>
-            <div style={{ color: "var(--text-muted)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 2 }}>
+            <div style={{
+              color: "var(--text-muted)", fontSize: "10px",
+              letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 2,
+            }}>
               Long/Short Equity Fund &nbsp;·&nbsp; University of Virginia
             </div>
           </div>
         </a>
 
+        {/* Divider */}
+        <div style={{ width: 1, height: 28, background: "var(--border-lt)", flexShrink: 0 }} />
+
         {/* Nav links */}
-        <nav style={{ display: "flex", alignItems: "center", gap: "0.125rem" }}>
+        <nav style={{ display: "flex", alignItems: "center", gap: "2px", flex: 1 }}>
           {NAV_LINKS.map(({ href, label }) => (
-            <a key={href} href={href}
-              className="nav-link"
-              style={{
-                color: "var(--text-secondary)",
-                fontSize: "0.7rem",
-                fontWeight: 600,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                padding: "0.375rem 0.875rem",
-                textDecoration: "none",
-                borderRadius: 1,
-                transition: "color 0.15s, background 0.15s",
-              }}
-            >
+            <a key={href} href={href} className="nav-link" style={{
+              color: "var(--text-secondary)",
+              fontSize: "11px",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              padding: "5px 12px",
+              textDecoration: "none",
+              borderRadius: 2,
+              transition: "color 0.15s, background 0.15s",
+            }}>
               {label}
             </a>
           ))}
         </nav>
 
-        {/* Right actions */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        {/* Actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
           <a href="/trade" style={{
-            background: "var(--navy-600)",
-            border: "1px solid var(--navy-500)",
+            background: "var(--navy-500)",
+            border: "1px solid var(--navy-400)",
             color: "#fff",
-            fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-            padding: "0.4rem 1rem", textDecoration: "none", borderRadius: 2,
+            fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
+            padding: "6px 14px", textDecoration: "none", borderRadius: 2,
             transition: "background 0.15s",
           }}>
             + Trade

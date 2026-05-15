@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recha
 import { SectorAllocation } from "@/types";
 import { fmt$ } from "@/lib/calculations";
 
-const PALETTE = ["#2E66A8","#C4993A","#27AE60","#5B90C8","#1A6B47","#8B6914","#204880","#DDB95A","#95B9D9","#4A7FC1"];
+const PALETTE = ["#2E66A8","#3B6CC7","#27AE60","#5B90C8","#1A6B47","#8B6914","#204880","#5587D9","#95B9D9","#4A7FC1"];
 const TT_STYLE = { background: "#07111F", border: "1px solid #112545", borderRadius: 2, color: "#EDF2F7", fontSize: 12, padding: "8px 12px" };
 
 export default function SectorChart({ data }: { data: SectorAllocation[] }) {

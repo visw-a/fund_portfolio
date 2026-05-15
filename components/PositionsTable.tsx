@@ -47,7 +47,7 @@ export default function PositionsTable({ positions, nav, showClosed = false, onU
   const thStyle = (col: SortKey): React.CSSProperties => ({
     cursor: "pointer",
     userSelect: "none",
-    color: sortKey === col ? "#C4993A" : "var(--text-muted)",
+    color: sortKey === col ? "var(--blue)" : "var(--text-muted)",
     fontSize: "0.6rem",
     fontWeight: 700,
     letterSpacing: "0.1em",
@@ -158,7 +158,7 @@ export default function PositionsTable({ positions, nav, showClosed = false, onU
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
                     <span style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "var(--text-secondary)" }}>{weight.toFixed(2)}%</span>
                     <div style={{ width: 48, height: 2, background: "var(--navy-700)", borderRadius: 1 }}>
-                      <div style={{ height: "100%", borderRadius: 1, background: "var(--gold)", width: `${Math.min(weight * 5, 100)}%` }} />
+                      <div style={{ height: "100%", borderRadius: 1, background: "var(--blue)", width: `${Math.min(weight * 5, 100)}%` }} />
                     </div>
                   </div>
                 </td>

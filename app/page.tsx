@@ -13,6 +13,7 @@ import SectorChart from "@/components/charts/SectorChart";
 import PnLContributionChart from "@/components/charts/PnLContributionChart";
 import SectorAttributionChart from "@/components/charts/SectorAttributionChart";
 import RiskReturnChart from "@/components/charts/RiskReturnChart";
+import BenchmarkChart from "@/components/charts/BenchmarkChart";
 
 // ── Reusable metric tile ──────────────────────────────────────────────────────
 function KPI({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
@@ -63,6 +64,7 @@ export default function Dashboard() {
   const [positions, setPositions]   = useState<Position[]>([]);
   const [cashBalance, setCashBalance] = useState(0);
   const [metrics, setMetrics]       = useState<PortfolioMetrics | null>(null);
+  const [benchmark, setBenchmark]   = useState<{ chartData: {date:string;mii:number|null;spy:number|null}[]; sharpe: number|null; dataPoints: number } | null>(null);
   const [loading, setLoading]       = useState(true);
   const [lastUpdated, setLastUpdated] = useState("");
   const [tab, setTab]               = useState<"overview" | "risk" | "attribution">("overview");
@@ -86,11 +88,16 @@ export default function Dashboard() {
     try { const r = await fetch("/api/metrics"); if (r.ok) setMetrics(await r.json()); } catch { /**/ }
   }, []);
 
+  const refreshBenchmark = useCallback(async () => {
+    try { const r = await fetch("/api/benchmark"); if (r.ok) setBenchmark(await r.json()); } catch { /**/ }
+  }, []);
+
   useEffect(() => {
-    refresh(); refreshMetrics();
+    refresh(); refreshMetrics(); refreshBenchmark();
     const t1 = setInterval(() => refresh(true), 60_000);
     const t2 = setInterval(refreshMetrics, 300_000);
-    return () => { clearInterval(t1); clearInterval(t2); };
+    const t3 = setInterval(refreshBenchmark, 300_000);
+    return () => { clearInterval(t1); clearInterval(t2); clearInterval(t3); };
   }, [refresh, refreshMetrics]);
 
   const open    = positions.filter((p) => p.status === "open");
@@ -110,6 +117,8 @@ export default function Dashboard() {
   const top5Weight  = byValue.slice(0, 5).reduce((s, p) => s + (p.currentPrice * p.shares / nav) * 100, 0);
   const winRate     = open.length > 0 ? (open.filter((p) => calcPositionPnL(p) > 0).length / open.length) * 100 : 0;
   const daysOpen    = Math.floor((Date.now() - new Date("2026-01-01").getTime()) / 86400000);
+  const sharpe      = benchmark?.sharpe ?? null;
+  const dataPoints  = benchmark?.dataPoints ?? 0;
 
   const navUp = stats.inceptionReturn >= 0;
   const pnlUp = stats.totalUnrealizedPnL >= 0;
@@ -117,7 +126,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 320, flexDirection: "column", gap: 12 }}>
-        <div style={{ width: 28, height: 28, border: "2px solid var(--gold)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: 28, height: 28, border: "2px solid var(--blue)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>Loading Portfolio</p>
       </div>
@@ -131,7 +140,7 @@ export default function Dashboard() {
       <div style={{ borderBottom: "1px solid var(--border)", paddingBottom: "1.25rem", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
         <div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "1rem", flexWrap: "wrap" }}>
-            <span style={{ fontFamily: "monospace", fontSize: "2rem", fontWeight: 700, color: "var(--gold)", letterSpacing: "0.02em", lineHeight: 1 }}>
+            <span style={{ fontFamily: "monospace", fontSize: "2rem", fontWeight: 700, color: "#fff", letterSpacing: "0.02em", lineHeight: 1 }}>
               {fmt$(nav, 2)}
             </span>
             <span style={{ fontFamily: "monospace", fontSize: "1rem", fontWeight: 600,
@@ -185,12 +194,16 @@ export default function Dashboard() {
         <Stat label="L/S Ratio"       value={stats.longShortRatio > 0 ? `${stats.longShortRatio.toFixed(2)}×` : "L-Only"} />
         <Stat label="# Positions"     value={`${stats.longCount}L · ${stats.shortCount}S`} />
         <Stat label="Top-5 Conc."     value={`${top5Weight.toFixed(1)}%`} />
-        <Stat label="Win Rate"        value={`${winRate.toFixed(0)}%`} color={winRate >= 50 ? "#27AE60" : "#E03131"} />
+        <Stat label="Win Rate"  value={`${winRate.toFixed(0)}%`} color={winRate >= 50 ? "#27AE60" : "#EF4444"} />
+        <Stat label="SPY Return" value={spyReturn !== null ? fmtPct(spyReturn) : "—"}
+          color={spyReturn !== null ? (spyReturn >= 0 ? "#27AE60" : "#EF4444") : undefined} />
         <div style={{ padding: "0.625rem 0.875rem", flex: 1, minWidth: 0 }}>
-          <div className="section-label" style={{ marginBottom: 3 }}>SPY Return</div>
-          <div style={{ fontFamily: "monospace", fontSize: "0.875rem", fontWeight: 600,
-            color: spyReturn !== null ? (spyReturn >= 0 ? "#27AE60" : "#E03131") : "var(--text-muted)" }}>
-            {spyReturn !== null ? fmtPct(spyReturn) : "—"}
+          <div className="section-label" style={{ marginBottom: 3 }}>
+            Sharpe {dataPoints < 30 && <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>({dataPoints}/30 days)</span>}
+          </div>
+          <div style={{ fontFamily: "monospace", fontSize: "13px", fontWeight: 600,
+            color: sharpe !== null ? (sharpe >= 1 ? "#27AE60" : sharpe >= 0 ? "var(--text-secondary)" : "#EF4444") : "var(--text-muted)" }}>
+            {sharpe !== null ? sharpe.toFixed(2) : "Collecting…"}
           </div>
         </div>
       </div>
@@ -202,8 +215,8 @@ export default function Dashboard() {
             background: "transparent", border: "none", cursor: "pointer",
             padding: "0.5rem 1.25rem",
             fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-            color: tab === t ? "var(--gold)" : "var(--text-muted)",
-            borderBottom: `2px solid ${tab === t ? "var(--gold)" : "transparent"}`,
+            color: tab === t ? "var(--blue)" : "var(--text-muted)",
+            borderBottom: `2px solid ${tab === t ? "var(--blue)" : "transparent"}`,
             marginBottom: -1,
             transition: "color 0.15s",
           }}>
@@ -215,6 +228,11 @@ export default function Dashboard() {
       {/* ── Overview ── */}
       {tab === "overview" && (
         <>
+          {/* Benchmark chart — full width */}
+          <Panel title="Performance vs S&P 500" sub="Indexed to 100 at 01 Jan 2026 · MII L/S Fund vs SPY">
+            <BenchmarkChart data={benchmark?.chartData ?? []} />
+          </Panel>
+
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
             <Panel title="Exposure Breakdown">
               <ExposureChart longValue={stats.totalLongValue} shortValue={stats.totalShortValue}
@@ -274,7 +292,7 @@ export default function Dashboard() {
                         <span style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "var(--text-muted)" }}>{w.toFixed(2)}%</span>
                       </div>
                       <div style={{ height: 2, background: "var(--navy-700)", borderRadius: 1 }}>
-                        <div style={{ height: "100%", borderRadius: 1, background: "var(--gold)", width: `${Math.min(w * 5, 100)}%`, transition: "width 0.3s" }} />
+                        <div style={{ height: "100%", borderRadius: 1, background: "var(--blue)", width: `${Math.min(w * 5, 100)}%`, transition: "width 0.3s" }} />
                       </div>
                     </div>
                   );
@@ -387,7 +405,7 @@ export default function Dashboard() {
       {/* ── Holdings Table ── */}
       <Panel title="Holdings"
         sub={`${open.length} open positions · Click column headers to sort`}
-        action={<a href="/positions" style={{ fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--gold)", textDecoration: "none" }}>Full View →</a>}
+        action={<a href="/positions" style={{ fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#fff", textDecoration: "none" }}>Full View →</a>}
       >
         <PositionsTable positions={positions} nav={nav} onUpdated={refresh} />
       </Panel>

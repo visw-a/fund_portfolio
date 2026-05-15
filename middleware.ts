@@ -9,7 +9,7 @@ export function middleware(req: NextRequest) {
   if (SKIP.some((p) => pathname.startsWith(p))) return NextResponse.next();
 
   const token = req.cookies.get(AUTH_COOKIE)?.value;
-  if (token === process.env.AUTH_TOKEN) return NextResponse.next();
+  if (token && token === process.env.AUTH_TOKEN) return NextResponse.next();
 
   const url = req.nextUrl.clone();
   url.pathname = "/login";
@@ -17,5 +17,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico).*)"],
 };

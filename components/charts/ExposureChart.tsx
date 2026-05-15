@@ -16,7 +16,7 @@ export default function ExposureChart({ longValue, shortValue, netExposure, cash
   const data = [
     { name: "Long", value: longValue,              color: "#27AE60" },
     { name: "Short", value: shortValue,            color: "#E03131" },
-    { name: "Net",  value: Math.abs(netExposure),  color: "#C4993A" },
+    { name: "Net",  value: Math.abs(netExposure),  color: "#3B6CC7" },
     { name: "Cash", value: cashBalance,            color: "#2E66A8" },
   ];
 
