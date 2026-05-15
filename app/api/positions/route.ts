@@ -15,6 +15,7 @@ const TradeSchema = z.object({
   analyst: z.string().default(""),
   thesis: z.string().default(""),
   notes: z.string().default(""),
+  tradePassword: z.string().default(""),
 });
 
 export async function GET() {
@@ -32,6 +33,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const data = TradeSchema.parse(body);
+
+    if (data.tradePassword !== process.env.TRADE_PASSWORD) {
+      return NextResponse.json({ error: "Incorrect trade authorization password" }, { status: 401 });
+    }
 
     await ensureSheetsExist();
     const positions = await getPositions();

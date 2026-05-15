@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import LogoutButton from "@/components/LogoutButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,10 +38,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ))}
             </div>
           </div>
-          <a href="/trade"
-            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors">
-            + Trade
-          </a>
+          <div className="flex items-center gap-2">
+            <a href="/trade" className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors">
+              + Trade
+            </a>
+            <LogoutButton />
+          </div>
         </nav>
         <main className="px-6 py-8 max-w-7xl mx-auto">{children}</main>
       </body>

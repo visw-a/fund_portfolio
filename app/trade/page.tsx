@@ -37,6 +37,7 @@ export default function TradePage() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [review, setReview] = useState(false);
+  const [tradePassword, setTradePassword] = useState("");
   const [flash, setFlash] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const refresh = useCallback(async () => {
@@ -102,13 +103,14 @@ export default function TradePage() {
           analyst,
           thesis,
           notes,
+          tradePassword,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Trade failed");
 
       setFlash({ type: "success", msg: `${action} ${fmtNum(sharesNum, 0)} ${ticker.toUpperCase()} @ ${fmt$(priceNum, 2)} executed successfully.` });
-      setTicker(""); setShares(""); setPrice(""); setThesis(""); setNotes("");
+      setTicker(""); setShares(""); setPrice(""); setThesis(""); setNotes(""); setTradePassword("");
       setReview(false);
       setConfirmed(false);
       refresh();
@@ -269,6 +271,18 @@ export default function TradePage() {
                 )}
               </div>
 
+              <div>
+                <label className="label">Trade Authorization Password</label>
+                <input
+                  type="password"
+                  className="input"
+                  placeholder="Enter trade password to authorize"
+                  value={tradePassword}
+                  onChange={(e) => setTradePassword(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -284,12 +298,12 @@ export default function TradePage() {
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => { setReview(false); setConfirmed(false); }}
+                  onClick={() => { setReview(false); setConfirmed(false); setTradePassword(""); }}
                   className="flex-1 py-3 rounded-lg text-sm font-medium text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 transition-colors">
                   Back
                 </button>
                 <button
-                  disabled={!confirmed || submitting || cashAfter < 0}
+                  disabled={!confirmed || submitting || cashAfter < 0 || !tradePassword}
                   onClick={submitTrade}
                   className={`flex-1 py-3 rounded-lg text-sm font-bold disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors ${
                     action === "BUY" ? "bg-emerald-600 hover:bg-emerald-500" :
